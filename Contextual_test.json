@@ -1,0 +1,430 @@
+{
+  "name": "Contextual",
+  "nodes": [
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash-exp",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        940,
+        -40
+      ],
+      "id": "de1b96cb-2e5a-4f11-b804-4a58dcc9be7c",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "H5BzQS1JKT04VtOl",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash-exp",
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        20,
+        -20
+      ],
+      "id": "80548205-d6b2-484b-a7eb-52141ad29d98",
+      "name": "Google Gemini Chat Model2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "H5BzQS1JKT04VtOl",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message }}",
+        "options": {
+          "systemMessage": "You are an assistant for the company GOBRANDING. You should respond in a cute, friendly, professional, concise, and accurate manner. Always follow these steps:\n\n1. Always start by performing RAG (retrieval-augmented generation) by calling the 'data_info' tool only if the user’s message appears to request factual, business, or service-related information.\n\nDo not call RAG if the user is:\n- Sending etiquette interactions (e.g., greetings, farewells, thank-yous),\n- Typing fragments or casual openers (e.g., \"tui\", \"mình hỏi cái này\", \"quảng cáo\"),\n- Or sending messages that clearly do not require data to respond (e.g., simple confirmations like \"OK\", \"vâng\", emojis).\n\n2. If this is the user's first message, briefly introduce yourself once as GOBRANDING's assistant. Keep it warm, friendly, and professional. Clearly state that you can only support with certain information (not full customer service). Do not introduce again in later replies.\n\n3. Read all the text after the last appearance of \"Tool:\". Do not respond to that text directly, but use it to give a clear, complete explanation. Include all relevant details from the tool’s response in your answer. Always answer in Vietnamese.\n\n4. If the tool returns no data, or says it does not have the information, or does not know, **politely say you don’t have the information. Make it clear to the user that nothing was found. Do not make something up just to please them.**\n\n5. (Only after answering the user's question in step 2):\n   If the customer hasn’t provided their phone number, choose an appropriate time to ask for the user's phone number so you can provide better support, but ask in a gentle way that doesn’t make them feel pressured.\n\nNote:\nIf the customer provides phone number/email (in encrypted form) or website/fanpage, thank them and say you will reach out. Then continue by asking what else they would like assistance with.\n\nSpecial case: If a user expresses interest in any digital marketing service (e.g., Google Ads, SEO, website, branding, social media, etc.):\n\n1. Briefly and clearly introduce GOBRANDING’s capabilities in that area.\n\n2. Acknowledge the user’s business type (if provided), and show understanding of their needs.\n\n3. Invite them to leave contact info and give them the url to consultation form to fill-in (https://gobranding.com.vn/#blockContactForm).\n\n4. Keep the tone supportive, friendly, and confident."
+        }
+      },
+      "id": "1c4dd3a7-3771-45ad-9412-39d9fa0db395",
+      "name": "AI Agent1",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        320,
+        -380
+      ],
+      "notes": "Trung tâm điều khiển chatbot, chứa system_prompt (tôi là ai, tôi làm task gì, phong cách trả lời thế nào,...)"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.sessionId }}",
+        "tableName": "n8n_ggroup_chat_histories"
+      },
+      "id": "b71ff714-9e14-494c-9973-26ac146bbe34",
+      "name": "Postgres Chat Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        360,
+        20
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "hOIgXX6jTOTMMSTU",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputSource": "jsonExample",
+        "jsonExample": "{\n    \"sessionId\": \"123\",\n    \"message\": \"message\"\n}"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -120,
+        -360
+      ],
+      "id": "6c893551-05dd-402c-a5c1-85595af49d40",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.1,
+      "position": [
+        1200,
+        -640
+      ],
+      "id": "09ebdef2-e55f-4ae2-9c9e-bd4e05bc5c2a",
+      "name": "Supabase Vector Store1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "uk3CPqYFZxrBoKo1",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [
+        1260,
+        -360
+      ],
+      "id": "b2ae56a5-7a53-4afc-9664-de09d8d21061",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        -140
+      ],
+      "id": "2f94059d-aa2f-465c-b877-567d1cf6d374",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "options": {
+          "allowFileUploads": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        920,
+        -600
+      ],
+      "id": "60db14e8-1254-4f62-bcd9-01703b82694e",
+      "name": "When chat message received",
+      "webhookId": "780cc0d0-f4f0-42aa-9cf7-f6bfa98d2b0b"
+    },
+    {
+      "parameters": {
+        "modelName": "models/text-embedding-004"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        700,
+        160
+      ],
+      "id": "06fb34b7-62cb-4bf9-931d-28dca245912a",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "H5BzQS1JKT04VtOl",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/text-embedding-004"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1060,
+        -400
+      ],
+      "id": "59b11873-cad7-4c10-bce4-2fa650d750a3",
+      "name": "Embeddings Google Gemini1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "H5BzQS1JKT04VtOl",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "95feae04-f8b8-49f6-94b6-48ba674573ca",
+              "leftValue": "={{ $json.message }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        100,
+        -400
+      ],
+      "id": "a904af3f-fd85-497c-bb22-c3b3faa00feb",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {
+          "queryName": "match_documents"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.1,
+      "position": [
+        600,
+        -60
+      ],
+      "id": "4071a51b-0d53-4ace-934f-a5f76c27c5a2",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "uk3CPqYFZxrBoKo1",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "Use RAG to look up information in the knowledgebase",
+        "topK": 100
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "typeVersion": 1.1,
+      "position": [
+        720,
+        -240
+      ],
+      "id": "f75ef60b-7d6d-4c8b-8746-76100482ca23",
+      "name": "data_info",
+      "executeOnce": false,
+      "alwaysOutputData": true
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "data_info",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store1",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "data_info",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "data_info": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "94e106a9-491a-4a1f-a575-745730919265",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9a824605e6983c51c580c9c6789f1f252d807125cf79febf2f79f109fa79555c"
+  },
+  "id": "p4p4sSQQTM0e4E6X",
+  "tags": []
+}

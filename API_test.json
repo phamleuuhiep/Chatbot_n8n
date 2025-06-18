@@ -1,0 +1,314 @@
+{
+  "name": "API",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "af1dcac7-c00c-4a98-9d67-3f24bc7c1e2d",
+        "responseMode": "lastNode",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "315dc378-1a34-493f-99dd-7f8fe3bcc9dc",
+      "name": "Webhook",
+      "webhookId": "af1dcac7-c00c-4a98-9d67-3f24bc7c1e2d"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "p4p4sSQQTM0e4E6X",
+          "mode": "list",
+          "cachedResultName": "Contextual"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "sessionId": "={{ $json.body.sessionId }}",
+            "message": "={{ $json.sanitizedMessage }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "sessionId",
+              "displayName": "sessionId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        420,
+        0
+      ],
+      "id": "2d15a294-9141-4d3c-9f48-20eafb683ae5",
+      "name": "Execute Workflow",
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const text = item.json.body.message || \"\";\n\n  const emailRegex = /\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\\b/g;\n  const phoneRegex = /\\b(\\+?\\d{1,3}[-.\\s]?)?(\\(?\\d{2,4}\\)?[-.\\s]?)?[\\d\\-.\\s]{7,15}\\b/g;\n  const urlRegex = /\\bhttps?:\\/\\/[^\\s/$.?#].[^\\s]*\\b/gi;\n\n  // Replace emails, phone numbers, and URLs with placeholders\n  // const maskedText = text\n  const maskedText = text\n    .replace(emailRegex, '((encrypteinfo))')\n    .replace(phoneRegex, '((encrypteinfo))')\n    .replace(urlRegex, '((encryptedlink))');\n\n  item.json.originalMessage = text;\n  item.json.sanitizedMessage = maskedText;\n\n  return item;\n});\n\n// return items.map(item => {\n//   const text = item.json.body.message || \"\";\n\n//   const emailRegex = /\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\\b/g;\n//   const phoneRegex = /\\b(\\+?\\d{1,3}[-.\\s]?)?(\\(?\\d{2,4}\\)?[-.\\s]?)?[\\d\\-.\\s]{7,15}\\b/g;\n\n//   const maskedText = text\n//     .replace(emailRegex, '((encrypteinfo))')\n//     .replace(phoneRegex, '((encrypteinfo))');\n\n//   return {\n//     json: {\n//       messages: [\n//         {\n//           role: \"user\",\n//           parts: [\n//             {\n//               text: maskedText.trim()\n//             }\n//           ]\n//         }\n//       ]\n//     }\n//   };\n// });\n\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "1ccf32fc-0f63-45f1-a826-0419166dbdc4",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "47a1edac-45f5-4c0c-98f7-8a216f815f17",
+              "name": "timeNow",
+              "value": "={{ $now.setZone('Asia/Bangkok').toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "a078ef5a-0e9d-415b-ad73-bbd1dcbfc2ca",
+              "name": "sessionId",
+              "value": "={{ $('Webhook').item.json.body.sessionId }}",
+              "type": "string"
+            },
+            {
+              "id": "a7e6be44-e354-4e00-b411-c8550cce256a",
+              "name": "Human",
+              "value": "={{ $('Webhook').item.json.body.message }}",
+              "type": "string"
+            },
+            {
+              "id": "b87f916b-2fe5-4f1d-ad77-f19d2cfe16a2",
+              "name": "AI",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        620,
+        0
+      ],
+      "id": "6f6dfb0d-d769-401a-876a-b312a5654e4c",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1KtuFpYgvhR9Ej0XDRA0ykOlxoGeu7RDN4OEmoPn8Roo",
+          "mode": "list",
+          "cachedResultName": "Test_sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KtuFpYgvhR9Ej0XDRA0ykOlxoGeu7RDN4OEmoPn8Roo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KtuFpYgvhR9Ej0XDRA0ykOlxoGeu7RDN4OEmoPn8Roo/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "DateTime": "={{ $json.timeNow }}",
+            "Question": "={{ $json.Human }}",
+            "Answer": "={{ $json.AI }}"
+          },
+          "matchingColumns": [
+            "Question"
+          ],
+          "schema": [
+            {
+              "id": "Question",
+              "displayName": "Question",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Answer",
+              "displayName": "Answer",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "DateTime",
+              "displayName": "DateTime",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Chatbot",
+              "displayName": "Chatbot",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "cellFormat": "RAW"
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        820,
+        0
+      ],
+      "id": "e4266045-8a9a-483f-b01e-5c270aefa31b",
+      "name": "Update Records",
+      "credentials": {
+        "googleApi": {
+          "id": "fNmoLuavvY5ygzNK",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6de89363-4769-4eb1-9312-cfb73bd2fa4c",
+              "name": "output",
+              "value": "={{ $('Edit Fields').item.json.AI }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1000,
+        0
+      ],
+      "id": "7284944b-7c03-4c09-b8d5-f994d94dca27",
+      "name": "Final Output"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Update Records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Records": {
+      "main": [
+        [
+          {
+            "node": "Final Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "cd23648d-9013-4c4c-b228-d3b3cc2c23d9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9a824605e6983c51c580c9c6789f1f252d807125cf79febf2f79f109fa79555c"
+  },
+  "id": "t2RpHXNbSmoxUSN9",
+  "tags": []
+}
